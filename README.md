@@ -1,4 +1,4 @@
-# Diffiomorphism from a Torus $(T^2)$ to Sphere $(S^2)$
+# Diffeomorphism map from a Torus $(T^2)$ to Sphere $(S^2)$ and its inverse.
 
 This repository explores the mathematical formulations and transformations of the torus and the sphere. Below, we detail the parametric equations, transformations, and how specific limits transition between these shapes.
 
