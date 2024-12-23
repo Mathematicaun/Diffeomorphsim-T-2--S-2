@@ -1,94 +1,82 @@
-# Toroidal Surface Vector Field Visualization
+# Mathematical Frameworks for the Torus and Sphere
 
-## Overview
+This repository explores the mathematical formulations and transformations of the torus and the sphere. Below, we detail the parametric equations, transformations, and how specific limits transition between these shapes.
 
-This project models a **torus** using parametric equations and computes the tangent vectors at each point on the surface. The vector field is visualized using a 3D plot and quiver vectors, which represent the local orientation and stretching of the surface. The computation is performed using symbolic differentiation, with numerical evaluation via **CuPy** for efficient GPU computation.
+## Torus
 
-## Mathematical Framework
-
-### Torus Parameterization
-
-The torus is described using two angular parameters, $a$ and $b$, each ranging from 0 to 1. The surface is defined by two radii:
-
-- $R$: Major radius (distance from the center of the tube to the center of the torus).
-- $r$: Minor radius (radius of the tube).
-
-The parametric equations for the torus are:
+The torus is represented parametrically as:
 
 $$
-\chi(a, b) = (r \cos(2\pi a) + R) \cos(2\pi b)
+\begin{aligned}
+    x(u, v) &= (R + r \cos v) \cos u, \\
+    y(u, v) &= (R + r \cos v) \sin u, \\
+    z(u, v) &= r \sin v,
+\end{aligned}
 $$
 
-$$
-\psi(a, b) = (r \cos(2\pi a) + R) \sin(2\pi b)
-$$
+where:
+- $R$ is the major radius (distance from the center of the hole to the center of the tube),
+- $r$ is the minor radius (radius of the tube),
+- $u, v \in [0, 2\pi)$ are the parametric angles.
+
+### Basis Vectors
+
+The tangent vectors to the torus are obtained by differentiating the parametric equations with respect to $u$ and $v$:
+- $\frac{\partial \vec{r}}{\partial u} = \left( -(R + r \cos v) \sin u, (R + r \cos v) \cos u, 0 \right)$,
+- $\frac{\partial \vec{r}}{\partial v} = \left( -r \sin v \cos u, -r \sin v \sin u, r \cos v \right)$.
+
+These vectors span the tangent plane at each point on the torus.
+
+## Sphere
+
+The sphere can be represented parametrically as:
 
 $$
-\zeta(a, b) = r \sin(2\pi a)
+\begin{aligned}
+    x(\theta, \phi) &= r \sin \phi \cos \theta, \\
+    y(\theta, \phi) &= r \sin \phi \sin \theta, \\
+    z(\theta, \phi) &= r \cos \phi,
+\end{aligned}
 $$
 
-Where:
-- $a$ traces around the minor circle (tube of the torus),
-- $b$ traces around the major circle (the central circular path).
+where:
+- $r$ is the radius of the sphere,
+- $\theta \in [0, 2\pi)$ is the azimuthal angle,
+- $\phi \in [0, \pi]$ is the polar angle.
 
-### Partial Derivatives
+### Basis Vectors
 
-The partial derivatives of the parametric equations with respect to $a$, $b$, $R$, and $r$ are computed to understand how the surface behaves locally:
+The tangent vectors to the sphere are derived by differentiating with respect to $\theta$ and $\phi$:
+- $\frac{\partial \vec{r}}{\partial \theta} = \left( -r \sin \phi \sin \theta, r \sin \phi \cos \theta, 0 \right)$,
+- $\frac{\partial \vec{r}}{\partial \phi} = \left( r \cos \phi \cos \theta, r \cos \phi \sin \theta, -r \sin \phi \right)$.
 
-- $$ \frac{\partial \chi}{\partial a}, \frac{\partial \psi}{\partial a}, \frac{\partial \zeta}{\partial a} $$: Derivatives with respect to the $a$-parameter (minor circle).
-- $$ \frac{\partial \chi}{\partial b}, \frac{\partial \psi}{\partial b}, \frac{\partial \zeta}{\partial b} $$: Derivatives with respect to the $b$-parameter (major circle).
-- $$ \frac{\partial \chi}{\partial R}, \frac{\partial \psi}{\partial R}, \frac{\partial \zeta}{\partial R} $$: Derivatives with respect to the major radius $R$.
-- $$ \frac{\partial \chi}{\partial r}, \frac{\partial \psi}{\partial r}, \frac{\partial \zeta}{\partial r} $$: Derivatives with respect to the minor radius $r$.
+These vectors form a basis for the tangent space at any point on the sphere.
 
-### Vector Field on the Torus
+## Transition from Torus to Sphere
 
-The code constructs the following tangent vectors based on the derivatives:
-
-- $$ \vec{e}_a = \left( \frac{\partial \chi}{\partial a}, \frac{\partial \psi}{\partial a}, \frac{\partial \zeta}{\partial a} \right) $$
-- $$ \vec{e}_b = \left( \frac{\partial \chi}{\partial b}, \frac{\partial \psi}{\partial b}, \frac{\partial \zeta}{\partial b} \right) $$
-- $$ \vec{e}_r = \left( \frac{\partial \chi}{\partial r}, \frac{\partial \psi}{\partial r}, \frac{\partial \zeta}{\partial r} \right) $$
-- $$ \vec{e}_R = \left( \frac{\partial \chi}{\partial R}, \frac{\partial \psi}{\partial R}, \frac{\partial \zeta}{\partial R} \right) $$
-
-These vectors represent the local tangent directions to the torus at each point.
-
-### Numerical Evaluation
-
-The parametric functions and their derivatives are evaluated over a grid of $a$ and $b$ values:
-
-- The $a$- and $b$-parameters are discretized using NumPy's `linspace` and `meshgrid`.
-- The parametric equations and derivatives are computed symbolically and then lambdified into CuPy functions for efficient GPU-based computation.
-
-### Vector Magnitude and Normalization
-
-The magnitudes of the tangent vectors are computed as:
+### Limit as $R \to 0$
+When the major radius $R$ tends to $0$, the torus collapses into a sphere-like structure:
 
 $$
-|\vec{e}_a| = \sqrt{e_{a,x}^2 + e_{a,y}^2 + e_{a,z}^2}
+\begin{aligned}
+    x(u, v) &= r \cos u \cos v, \\
+    y(u, v) &= r \sin u \cos v, \\
+    z(u, v) &= r \sin v,
+\end{aligned}
 $$
 
-and similarly for the other vectors $\vec{e}_b$, $\vec{e}_r$, and $\vec{e}_R$. These magnitudes represent the local "stretching" of the vectors. The vectors are then normalized to unit length for visualization.
+This corresponds to a sphere where $r$ remains constant, and the parameters $u$ and $v$ map directly to spherical coordinates.
 
-### Visualization
+## Special Cases
 
-The visualization uses `matplotlib` to create a 3D surface plot of the torus, where:
+1. **Degenerate Sphere:** When $r \to 0$, both the sphere and the torus reduce to a single point.
+2. **Flat Ring:** If $r$ is constant and $R \to \infty$, the torus becomes an infinitely thin flat ring.
 
-- The surface color can represent the magnitude of the vector field.
-- The `quiver` function is used to display the direction of the vector field on the surface, with vectors normalized to a constant length for clarity.
+## Applications
 
-### Animation (Optional)
+- **Torus:** Used in topology, geometry, and physics to study periodic systems.
+- **Sphere:** Central to many fields, including astronomy, computer graphics, and geodesy.
 
-Using the `FuncAnimation` module from `matplotlib`, an animation could be created to show how the vector field evolves over time as the parameters $a$ and $b$ vary.
+## Visualization
 
-## Installation
-
-To run this code, you will need the following libraries:
-
-- `numpy`
-- `matplotlib`
-- `sympy`
-- `cupy`
-
-You can install these dependencies using:
-
-```bash
-pip install numpy matplotlib sympy cupy
+Use Python and libraries like Matplotlib or Manim to visualize the transitions and structures. Scripts are provided in this repository to generate 3D plots and animations.
