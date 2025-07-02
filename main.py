@@ -1,5 +1,4 @@
 from matplotlib.animation import FuncAnimation
-from Torus import F
 import numpy as np
 import cupy as cp
 import matplotlib.pyplot as plt
